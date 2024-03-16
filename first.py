@@ -4,27 +4,22 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
 import datetime
-from pyspark.sql.functions import col , lit
+from pyspark.sql.functions import col, lit
+from functools import reduce
 
-# url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AXISBANK.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-# Create a SparkSession
+# url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AXISBANK.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+# Create SparkSession
 spark = SparkSession.builder \
     .appName("Data Transformation Example") \
     .getOrCreate()
 
-
 list_of_dataframes = list()
+
 def datashow(url):
+    response_from_website = requests.get(url)
+    data = response_from_website.json()              # data in object form so converting into json to see
 
-    responce_from_website = requests.get(url)
-
-    data = responce_from_website.json()
-
-
-
-
-
-    # Define the schema for the DataFrame
+    # Defining schema of DataFrame
     schema = StructType([
         StructField("Symbol", StringType(), True),
         StructField("Date", StringType(), True),
@@ -36,11 +31,11 @@ def datashow(url):
     ])
 
     # Provided data
-
     # Extract data and transform into DataFrame
-
     print(data)
-    print("*"*80)
+    print()
+    print("*" * 80)
+
     try:
         time_series_data = data.get('Time Series (Daily)')
         rows = []
@@ -56,76 +51,55 @@ def datashow(url):
             ]
             rows.append(row)
     except:
-
-        print(f"value error {url} " )
-
+        print(f"value error {url} ")
 
     # Create DataFrame from the extracted data
-
     try:
         df = spark.createDataFrame(rows, schema)
-
-        ndf = df.select("*").where(col("Date") == f'{datetime.datetime.now().date().strftime("%Y-%m-%d")}')
-
-        list_of_dataframes.append(ndf)
+        c_df = df.select("*").where(col("Date") == f'{datetime.datetime.now().date().strftime("%Y-%m-%d")}')     #df of today's date
+        list_of_dataframes.append(c_df)
     except:
-        print("error",url)
-    # Show the DataFrame
-    # df.show()
-    # hundraddf = df.select("*").limit(100)
-    # # hundraddf.write.format("orc").mode("overwrite").save("hdfs://localhost:9870/user/dbda/input")
-    # hundraddf.write\
-    #     .format("orc")\
-    #     .option('path', 'hdfs://localhost:9000/user/dbda/input')\
-    #     .mode('append')\
-    #     .save()[]
+        print("error", url)
 
 
-# import requests
+# BANKING
+axisBank = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AXISBANK.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+HDFCBANK = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=HDFCBANK.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+ICICIBANK = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=ICICIBANK.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
 
+#AUTOMOBILE
+MandM = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=M&M.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+MRF = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MRF.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+TVS = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=TVSMOTOR.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
 
-# now past the url for the fetch
+# PHARMA
+Cipla = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=Cipla.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+SunPharma = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SunPharma.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+Biocon = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=Biocon.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
 
-axisBank = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AXISBANK.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-HDFCBANK = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=HDFCBANK.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-ICICIBANK = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=ICICIBANK.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
+# FMCG
+Patanjali = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=PATANJALI.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+Sula = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SULA.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
+BajajHind = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=BAJAJHIND.BSE&outputsize=full&apikey=00ENS2T9SC25PHKO"
 
-MandM = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=M&M.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-MRF = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MRF.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-TVS = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=TVSMOTOR.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-
-## pharma
-Cipla = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=Cipla.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-SunPharma = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SunPharma.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-Biocon = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=Biocon.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-
-## FMCG
-
-Patanjali = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=PATANJALI.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-Sula = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SULA.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-BajajHind = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=BAJAJHIND.BSE&outputsize=full&apikey=Z96HU6A4EZ3KBB8V"
-
+# ,ICICIBANK,MandM,MRF,TVS,Cipla,SunPharma,Biocon,Patanjali,Sula,BajajHind
 count = 0
-for i in [axisBank,HDFCBANK,ICICIBANK,MandM,MRF,TVS,Cipla,SunPharma,Biocon,Patanjali,Sula,BajajHind]:
-    print(count)
+for company in [axisBank, HDFCBANK]:
+
+    print(count)                      #just to check
     count += 1
+    datashow(company)                 #function call
 
-    datashow(i)
-
-from functools import reduce
-new_combined_dataFrame = reduce(lambda df1,df2: df1.union(df2) , list_of_dataframes)
+#combing df's
+combined_dataFrame = reduce(lambda df1, df2: df1.union(df2), list_of_dataframes)
 
 ### making directory in HDFS
-
-# import os
-# hadoop fs -mkdir -p
+# hadoop fs -mkdir -p your path
+# hadoop -rm -R dir    -> to remove the dir or file
+# df = spark.read.csv('MandM.csv/part-00001-3b613bc9-c0fb-4f2c-88f5-dac2f5db2933-c000.csv')
 
 ### HDFS Injestion
-new_combined_dataFrame.write.mode('overwrite') \
+combined_dataFrame.write.mode('append') \
     .option("header", "true") \
-    .partitionBy("Symbol")\
-    .format("csv")\
-    .save("hdfs://localhost:9000/user/test/first")
-
-
-
+    .format("csv") \
+    .save("hdfs://localhost:9000/user/test")
