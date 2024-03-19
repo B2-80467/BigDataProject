@@ -56,8 +56,8 @@ def datashow(url):
     # Create DataFrame from the extracted data
     try:
         df = spark.createDataFrame(rows, schema)
-        c_df = df.select("*").where(col("Date") == f'{datetime.datetime.now().date().strftime("%Y-%m-%d")}')     #df of today's date
-        list_of_dataframes.append(c_df)
+        # c_df = df.select("*").where(col("Date") == f'{datetime.datetime.now().date().strftime("%Y-%m-%d")}')     #df of today's date
+        list_of_dataframes.append(df)
     except:
         print("error", url)
 
@@ -101,5 +101,6 @@ combined_dataFrame = reduce(lambda df1, df2: df1.union(df2), list_of_dataframes)
 ### HDFS Injestion
 combined_dataFrame.write.mode('append') \
     .option("header", "true") \
+    .partitionBy('Symbol')\
     .format("csv") \
     .save("hdfs://localhost:9000/user/test")
