@@ -27,7 +27,7 @@ for obj in s3.Bucket('cdacprojectsunbeam').objects.all():
     print(obj)
 
 # Load csv file directly into python
-obj = s3.Bucket('cdacprojectsunbeam').Object('part-00000-f264af3e-8bf5-4214-a773-90ebe34c6bab-c000.csv').get()
+# obj = s3.Bucket('cdacprojectsunbeam').Object('part-00000-f264af3e-8bf5-4214-a773-90ebe34c6bab-c000.csv').get()
 # foo = pd.read_csv(obj['Body'])
 #
 # print(foo)

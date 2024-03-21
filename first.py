@@ -99,8 +99,8 @@ combined_dataFrame = reduce(lambda df1, df2: df1.union(df2), list_of_dataframes)
 # df = spark.read.csv('MandM.csv/part-00001-3b613bc9-c0fb-4f2c-88f5-dac2f5db2933-c000.csv')
 
 ### HDFS Injestion
-combined_dataFrame.write.mode('append') \
+combined_dataFrame.write.mode('overwrite') \
     .option("header", "true") \
     .partitionBy('Symbol')\
     .format("csv") \
-    .save("hdfs://localhost:9000/user/test")
+    .save("hdfs://localhost:9000/user/airflow/test")
